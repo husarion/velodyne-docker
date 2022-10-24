@@ -1,0 +1,25 @@
+services:
+  velodyne:
+    image: husarion/velodyne:noetic
+    container_name: velodyne
+    network_mode: host
+    tty: true
+    command: >
+      roslaunch velodyne_pointcloud VLP16_points.launch
+        device_ip:=10.15.20.10
+        frame_id:=velodyne
+        max_range:=130.0
+        min_range:=0.4
+        pcap:=
+        port:=2368
+        read_fast:=false
+        read_once:=false
+        repeat_delay:=0.0
+        rpm:=600.0
+        gps_time:=false
+        pcap_time:=false
+        cut_angle:=-0.01
+        timestamp_first_packet:=false
+        laserscan_ring:=-1
+        laserscan_resolution:=0.007
+        organize_cloud:=false
