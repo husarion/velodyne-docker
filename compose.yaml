@@ -3,7 +3,6 @@ services:
     image: husarion/velodyne:noetic
     container_name: velodyne
     network_mode: host
-    tty: true
     command: >
       roslaunch velodyne_pointcloud VLP16_points.launch
         device_ip:=10.15.20.10
