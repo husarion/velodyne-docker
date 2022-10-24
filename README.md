@@ -3,7 +3,7 @@ Dockerized Velodyne LiDAR package.
 
 ## Velodyne configuration
 
-Connect to Velodyne using an ethernet cable
+Connect to Velodyne using an ethernet cable.
    
 To access the sensor's Web Interface, you must know the sensor's Ip. You can find it for example using `nmap`:
 
