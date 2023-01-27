@@ -3,7 +3,7 @@
 
 <launch>
 
-  <node name="panther_velodyne_tf" pkg="tf" type="static_transform_publisher" args="0.185 0 0 0 0 0 base_link velodyne 100" />
+  <node name="panther_velodyne_tf" pkg="tf" type="static_transform_publisher" args="0.185 0.0 0.2093 0.0 0.0 0.0 base_link velodyne 100" />
 
   <!-- declare arguments with default values -->
   <arg name="calibration" default="$(find velodyne_pointcloud)/params/VLP16db.yaml"/>
