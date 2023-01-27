@@ -1,0 +1,15 @@
+services:
+  velodyne:
+    image: husarion/velodyne:noetic
+    container_name: velodyne
+    network_mode: host
+    environment:
+      - ROS_IP=10.15.20.3
+      - ROS_MASTER_URI=http://10.15.20.2:11311
+    volumes:
+      - ./panther_velodyne.launch:/opt/ros/noetic/share/velodyne_pointcloud/launch/panther_velodyne.launch
+    command: >
+      roslaunch velodyne_pointcloud panther_velodyne.launch
+        device_ip:=10.15.20.10
+        frame_id:=velodyne
+        port:=2368

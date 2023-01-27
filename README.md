@@ -45,3 +45,12 @@ docker compose up
 ```
 
 You should be able to see sensor data on the `/velodyne_points` topic with standard `sensor_msgs/PointCloud2` message type.
+
+## Run with the Husarion Panther robot
+
+To run the Velodyne Puck sensor with the Husarion Panther robot you need to specify a transform between the robot and LIDAR links. Sensor position relative to the robot can be set by editing the `panther_velodyne.launch` file in the `/panther_velodyne` directory. Then go to the `panther_velodyne` directory and run:
+
+```bash
+cd panther_velodyne
+docker compose up
+```
