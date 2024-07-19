@@ -115,6 +115,9 @@ def generate_launch_description():
         output="both",
         parameters=[laserscan_params_file],
         namespace=robot_namespace,
+        remappings=[
+            ("velodyne_points", [device_namespace, "/velodyne_points"]),
+         ]
     )
 
     return launch.LaunchDescription(
