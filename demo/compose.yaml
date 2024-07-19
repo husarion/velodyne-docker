@@ -13,7 +13,7 @@ services:
     volumes:
       - ./panther_velodyne.launch:/opt/ros/noetic/share/velodyne_pointcloud/launch/panther_velodyne.launch
     command: >
-      roslaunch velodyne_pointcloud panther_velodyne.launch
-        device_ip:=10.15.20.148
-        frame_id:=velodyne
-        port:=2368
+      ros2 launch velodyne.launch.py
+        transform_params_file:=./config/panther_velodyne_pointcloud.yaml
+        driver_params_file:=./config/panther_velodyne_driver.yaml
+        robot_namespace:=panther/

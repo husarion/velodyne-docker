@@ -1,24 +1,46 @@
-#!/usr/bin/env python3
-
 # Copyright 2024 Husarion sp. z o.o.
+# Copyright 2019 Open Source Robotics Foundation, Inc.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
-from launch import LaunchDescription
+"""Launch the velodyne driver, pointcloud, and laserscan nodes with default configuration."""
+
+import os
+
+import ament_index_python.packages
+import launch
+import launch_ros.actions
+
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import EnvironmentVariable, LaunchConfiguration
-from launch_ros.actions import Node
-
+from nav2_common.launch import ReplaceString
 
 def generate_launch_description():
     device_namespace = LaunchConfiguration("device_namespace")
@@ -36,50 +58,79 @@ def generate_launch_description():
     )
 
     driver_params_file = LaunchConfiguration("driver_params_file")
-    declare_params_file_arg = DeclareLaunchArgument(
-        "params_file",
-        default_value="/config/panther_velodyne_driver.yaml",
+    driver_params_file_arg = DeclareLaunchArgument(
+        "driver_params_file",
+        default_value="/config/driver_params_file.yaml",
         description="Path to the parameter file for the velodyne_driver_node node.",
     )
 
-    pointcloud_params_file = LaunchConfiguration("pointcloud_params_file")
-    pointcloud_params_file_arg = DeclareLaunchArgument(
-        "params_file",
-        default_value="/config/panther_velodyne_pointcloud.yaml",
+    transform_params_file = LaunchConfiguration("transform_params_file")
+    transform_params_file_arg = DeclareLaunchArgument(
+        "transform_params_file",
+        default_value="/config/transform_params_file.yaml",
         description="Path to the parameter file for the velodyne_transform_node node.",
     )
 
-    velodyne_driver = Node(
+    driver_params_file = ReplaceString(
+        source_file=driver_params_file,
+        replacements={"<robot_namespace>": robot_namespace },
+    )
+    driver_params_file = ReplaceString(
+        source_file=driver_params_file,
+        replacements={"<device_namespace>": [device_namespace, "/"]},
+    )
+
+    velodyne_driver_node = launch_ros.actions.Node(
         package="velodyne_driver",
         executable="velodyne_driver_node",
-        name=device_namespace,
+        output="both",
+        parameters=[driver_params_file],
         namespace=robot_namespace,
-        parameters=[
-            {
-                "frame_id": device_namespace,
-                "tf_prefix": robot_namespace,
-            },
-            driver_params_file,
-        ],
+         remappings=[
+            ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
+         ]
     )
 
-    velodyne_pointcloud = Node(
+    velodyne_transform_node = launch_ros.actions.Node(
         package="velodyne_pointcloud",
         executable="velodyne_transform_node",
-        name=device_namespace,
+        output="both",
+        parameters=[transform_params_file],
         namespace=robot_namespace,
-        parameters=[
-            # pointcloud_params_file,
-        ],
+        remappings=[
+            ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
+            ("velodyne_points", [device_namespace, "/velodyne_points"]),
+         ]
     )
 
-    return LaunchDescription(
+    laserscan_share_dir = ament_index_python.packages.get_package_share_directory(
+        "velodyne_laserscan"
+    )
+    laserscan_params_file = os.path.join(
+        laserscan_share_dir, "config", "default-velodyne_laserscan_node-params.yaml"
+    )
+    velodyne_laserscan_node = launch_ros.actions.Node(
+        package="velodyne_laserscan",
+        executable="velodyne_laserscan_node",
+        output="both",
+        parameters=[laserscan_params_file],
+        namespace=robot_namespace,
+    )
+
+    return launch.LaunchDescription(
         [
-            declare_robot_namespace_arg,
+            driver_params_file_arg,
+            transform_params_file_arg,
             declare_device_namespace_arg,
-            declare_params_file_arg,
-            pointcloud_params_file_arg,
-            # velodyne_driver,
-            velodyne_pointcloud
+            declare_robot_namespace_arg,
+            velodyne_driver_node,
+            velodyne_transform_node,
+            velodyne_laserscan_node,
+            launch.actions.RegisterEventHandler(
+                event_handler=launch.event_handlers.OnProcessExit(
+                    target_action=velodyne_driver_node,
+                    on_exit=[launch.actions.EmitEvent(event=launch.events.Shutdown())],
+                )
+            ),
         ]
     )
