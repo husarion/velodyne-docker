@@ -1,0 +1,19 @@
+x-common-config: &common-config
+  network_mode: host
+  ipc: host
+  restart: always
+  environment:
+    - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp # Default FastDDS do not work
+    - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+
+services:
+  velodyne:
+    image: husarion/velodyne:humble
+    <<: *common-config
+    volumes:
+      - ./panther_velodyne.launch:/opt/ros/noetic/share/velodyne_pointcloud/launch/panther_velodyne.launch
+    command: >
+      roslaunch velodyne_pointcloud panther_velodyne.launch
+        device_ip:=10.15.20.148
+        frame_id:=velodyne
+        port:=2368

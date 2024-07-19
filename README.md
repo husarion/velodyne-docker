@@ -4,7 +4,7 @@ Dockerized Velodyne LiDAR package.
 ## Velodyne configuration
 
 Connect to Velodyne using an ethernet cable.
-   
+
 To access the sensor's Web Interface, you must know the sensor's Ip. You can find it for example using `nmap`:
 
 Find your ethernet Ip:
@@ -21,7 +21,7 @@ nmap -sn 10.15.20.0/24
 
 This will list all devices in the same network including Velodyne.
 
-Then you need to specify the host to which Velodyne will be able to send data. In the browser enter the sensor Ip to access Web Interface. 
+Then you need to specify the host to which Velodyne will be able to send data. In the browser enter the sensor Ip to access Web Interface.
 Go to **Host (Destination)** and change Ip Address to your device.
 Click the **set** button on the right, then go to the bottom and click the **Save configuration** button.
 
@@ -51,6 +51,6 @@ You should be able to see sensor data on the `/velodyne_points` topic with stand
 To run the Velodyne Puck sensor with the Husarion Panther robot you need to specify a transform between the robot and LIDAR links. Sensor position relative to the robot can be set by editing the `panther_velodyne.launch` file in the `/panther_velodyne` directory. Then go to the `panther_velodyne` directory and run:
 
 ```bash
-cd panther_velodyne
+cd demo
 docker compose up
 ```
