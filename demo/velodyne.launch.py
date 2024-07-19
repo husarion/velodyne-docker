@@ -37,7 +37,7 @@ def generate_launch_description():
 
     velodyne_driver = Node(
         package="velodyne_driver",
-        executable="velodyne_driver",
+        executable="velodyne_driver_node",
         name=device_namespace,
         namespace=robot_namespace,
         parameters=[

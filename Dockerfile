@@ -12,7 +12,7 @@ WORKDIR /ros2_ws
 RUN apt-get update && apt-get install -y \
         python3-transforms3d \
         ros-dev-tools \
-        ros-${ROS_DISTRO}-velodyne-driver && \
+        ros-${ROS_DISTRO}-velodyne-driver ros-${ROS_DISTRO}-velodyne-pointcloud && \
     rosdep init && \
     rosdep update --rosdistro $ROS_DISTRO && \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
