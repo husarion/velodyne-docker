@@ -69,7 +69,7 @@ def generate_launch_description():
         name=device_namespace,
         namespace=robot_namespace,
         parameters=[
-            pointcloud_params_file,
+            # pointcloud_params_file,
         ],
     )
 
@@ -79,7 +79,7 @@ def generate_launch_description():
             declare_device_namespace_arg,
             declare_params_file_arg,
             pointcloud_params_file_arg,
-            velodyne_driver,
+            # velodyne_driver,
             velodyne_pointcloud
         ]
     )

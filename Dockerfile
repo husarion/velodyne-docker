@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
     rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y && \
     source /opt/ros/$ROS_DISTRO/setup.bash && \
     colcon build --cmake-args -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release && \
-    echo $(ros2 pkg xml velodyne_driver| grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt && \
+    echo $(cat /opt/ros/humble/share/velodyne_driver/package.xml | grep '<version>' | sed -r 's/.*<version>([0-9]+.[0-9]+.[0-9]+)<\/version>/\1/g') >> /version.txt && \
     # Size optimalization
     apt-get remove -y \
         ros-dev-tools && \
@@ -27,4 +27,4 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 COPY demo/config/ /config
-COPY demo/velodyne.launch.py /
+COPY demo/velodybe.launch.py /
