@@ -73,11 +73,11 @@ def generate_launch_description():
 
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
-        replacements={"<robot_namespace>": robot_namespace },
+        replacements={"<robot_namespace>": robot_namespace, "//": "/" },
     )
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
-        replacements={"<device_namespace>": [device_namespace, "/"]},
+        replacements={"<device_namespace>": device_namespace},
     )
 
     velodyne_driver_node = launch_ros.actions.Node(
