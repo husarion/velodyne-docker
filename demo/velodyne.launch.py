@@ -117,7 +117,8 @@ def generate_launch_description():
         namespace=robot_namespace,
         remappings=[
             ("velodyne_points", [device_namespace, "/velodyne_points"]),
-         ]
+            ("scan", [device_namespace, "/scan"]),
+        ]
     )
 
     return launch.LaunchDescription(
