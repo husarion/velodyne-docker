@@ -35,6 +35,20 @@ def generate_launch_description():
         description="Namespace to all launched nodes and use namespace as tf_prefix. This aids in differentiating between multiple robots with the same devices.",
     )
 
+    driver_params_file = LaunchConfiguration("driver_params_file")
+    declare_params_file_arg = DeclareLaunchArgument(
+        "params_file",
+        default_value="/config/panther_velodyne_driver.yaml",
+        description="Path to the parameter file for the velodyne_driver_node node.",
+    )
+
+    pointcloud_params_file = LaunchConfiguration("pointcloud_params_file")
+    pointcloud_params_file_arg = DeclareLaunchArgument(
+        "params_file",
+        default_value="/config/panther_velodyne_pointcloud.yaml",
+        description="Path to the parameter file for the velodyne_transform_node node.",
+    )
+
     velodyne_driver = Node(
         package="velodyne_driver",
         executable="velodyne_driver_node",
@@ -45,19 +59,17 @@ def generate_launch_description():
                 "frame_id": device_namespace,
                 "tf_prefix": robot_namespace,
             },
+            driver_params_file,
         ],
     )
 
     velodyne_pointcloud = Node(
-        package="velodyne_driver",
-        executable="velodyne_driver",
+        package="velodyne_pointcloud",
+        executable="velodyne_transform_node",
         name=device_namespace,
         namespace=robot_namespace,
         parameters=[
-            {
-                "frame_id": device_namespace,
-                "tf_prefix": robot_namespace,
-            },
+            pointcloud_params_file,
         ],
     )
 
@@ -65,6 +77,8 @@ def generate_launch_description():
         [
             declare_robot_namespace_arg,
             declare_device_namespace_arg,
+            declare_params_file_arg,
+            pointcloud_params_file_arg,
             velodyne_driver,
             velodyne_pointcloud
         ]
