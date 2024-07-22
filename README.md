@@ -27,6 +27,8 @@ Click the **set** button on the right, then go to the bottom and click the **Sav
 
 For more information about Velodyne configuration refer to official User Manuals.
 
+If you find an IP of Velodyne change [configuration file](./demo/config/panther_velodyne_driver.yaml) to connect to the sensor.
+
 ## Run Velodyne in docker
 
 Clone this repo:
@@ -44,13 +46,4 @@ cd velodyne-docker
 docker compose up
 ```
 
-You should be able to see sensor data on the `/velodyne_points` topic with standard `sensor_msgs/PointCloud2` message type.
-
-## Run with the Husarion Panther robot
-
-To run the Velodyne Puck sensor with the Husarion Panther robot you need to specify a transform between the robot and LIDAR links. Sensor position relative to the robot can be set by editing the `panther_velodyne.launch` file in the `/panther_velodyne` directory. Then go to the `panther_velodyne` directory and run:
-
-```bash
-cd demo
-docker compose up
-```
+You should be able to see sensor data on the `/panther/velodyne/velodyne_points` topic with standard `sensor_msgs/msg/PointCloud2` message type.
