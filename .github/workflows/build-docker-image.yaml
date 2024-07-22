@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ros_distrno: [iron, humble]
+        ros_distro: [iron, humble]
 
     steps:
       - name: Checkout
