@@ -61,14 +61,12 @@ def generate_launch_description():
     driver_params_file = LaunchConfiguration("driver_params_file")
     driver_params_file_arg = DeclareLaunchArgument(
         "driver_params_file",
-        default_value="/config/driver_params_file.yaml",
         description="Path to the parameter file for the velodyne_driver_node node.",
     )
 
     transform_params_file = LaunchConfiguration("transform_params_file")
     transform_params_file_arg = DeclareLaunchArgument(
         "transform_params_file",
-        default_value="/config/transform_params_file.yaml",
         description="Path to the parameter file for the velodyne_transform_node node.",
     )
 
@@ -122,6 +120,21 @@ def generate_launch_description():
         ],
     )
 
+    static_transform_publisher = launch_ros.actions.Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=[
+            "0.185",
+            "0.0",
+            "0.2093",
+            "0.0",
+            "0.0",
+            "0.0",
+            [robot_namespace, "base_link"],
+            [robot_namespace, device_namespace],
+        ],
+    )
+
     return launch.LaunchDescription(
         [
             driver_params_file_arg,
@@ -131,6 +144,7 @@ def generate_launch_description():
             velodyne_driver_node,
             velodyne_transform_node,
             velodyne_laserscan_node,
+            static_transform_publisher,
             launch.actions.RegisterEventHandler(
                 event_handler=launch.event_handlers.OnProcessExit(
                     target_action=velodyne_driver_node,

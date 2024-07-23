@@ -11,6 +11,10 @@ services:
     image: husarion/velodyne:humble-2.4.0-20240722
     container_name: velodyne
     <<: *common-config
+    volumes:
+      - ./config/panther_velodyne_pointcloud.yaml:/config/panther_velodyne_pointcloud.yaml
+      - ./config/panther_velodyne_driver.yaml:/config/panther_velodyne_driver.yaml
+      - ./velodyne.launch.py:/velodyne.launch.py
     command: >
       ros2 launch /velodyne.launch.py
         transform_params_file:=/config/panther_velodyne_pointcloud.yaml
