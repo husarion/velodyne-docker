@@ -7,8 +7,6 @@ ARG PREFIX
 
 SHELL ["/bin/bash", "-c"]
 
-WORKDIR /ros2_ws
-
 RUN apt-get update && apt-get install -y \
         python3-transforms3d \
         ros-${ROS_DISTRO}-velodyne \

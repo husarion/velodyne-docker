@@ -34,15 +34,15 @@ If you find an IP of Velodyne change [configuration file](./demo/config/panther_
 Clone this repo:
 
 ```
-git clone https://github.com/husarion/velodyne-docker
+git clone -b ros2 https://github.com/husarion/velodyne-docker
 ```
 
-Sensor's parameters can be changed inside the `compose.yaml` file.
+Sensor's parameters can be changed, by editing or providing your own config files and mounting them into the container. Default config files are located in [config](./demo/config/) directory.
 
 Run docker compose:
 
 ```
-cd velodyne-docker
+cd velodyne-docker/demo
 docker compose up
 ```
 
