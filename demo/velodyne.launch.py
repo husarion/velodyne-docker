@@ -42,6 +42,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import EnvironmentVariable, LaunchConfiguration
 from nav2_common.launch import ReplaceString
 
+
 def generate_launch_description():
     device_namespace = LaunchConfiguration("device_namespace")
     declare_device_namespace_arg = DeclareLaunchArgument(
@@ -73,7 +74,7 @@ def generate_launch_description():
 
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
-        replacements={"<robot_namespace>": robot_namespace, "//": "/" },
+        replacements={"<robot_namespace>": robot_namespace, "//": "/"},
     )
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
@@ -86,9 +87,9 @@ def generate_launch_description():
         output="both",
         parameters=[driver_params_file],
         namespace=robot_namespace,
-         remappings=[
+        remappings=[
             ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
-         ]
+        ],
     )
 
     velodyne_transform_node = launch_ros.actions.Node(
@@ -100,7 +101,7 @@ def generate_launch_description():
         remappings=[
             ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
             ("velodyne_points", [device_namespace, "/velodyne_points"]),
-         ]
+        ],
     )
 
     laserscan_share_dir = ament_index_python.packages.get_package_share_directory(
@@ -118,7 +119,7 @@ def generate_launch_description():
         remappings=[
             ("velodyne_points", [device_namespace, "/velodyne_points"]),
             ("scan", [device_namespace, "/scan"]),
-        ]
+        ],
     )
 
     return launch.LaunchDescription(
