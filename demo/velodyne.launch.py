@@ -42,6 +42,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import EnvironmentVariable, LaunchConfiguration
 from nav2_common.launch import ReplaceString
 
+
 def generate_launch_description():
     device_namespace = LaunchConfiguration("device_namespace")
     declare_device_namespace_arg = DeclareLaunchArgument(
@@ -60,20 +61,18 @@ def generate_launch_description():
     driver_params_file = LaunchConfiguration("driver_params_file")
     driver_params_file_arg = DeclareLaunchArgument(
         "driver_params_file",
-        default_value="/config/driver_params_file.yaml",
         description="Path to the parameter file for the velodyne_driver_node node.",
     )
 
     transform_params_file = LaunchConfiguration("transform_params_file")
     transform_params_file_arg = DeclareLaunchArgument(
         "transform_params_file",
-        default_value="/config/transform_params_file.yaml",
         description="Path to the parameter file for the velodyne_transform_node node.",
     )
 
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
-        replacements={"<robot_namespace>": robot_namespace, "//": "/" },
+        replacements={"<robot_namespace>": robot_namespace, "//": "/"},
     )
     driver_params_file = ReplaceString(
         source_file=driver_params_file,
@@ -86,9 +85,9 @@ def generate_launch_description():
         output="both",
         parameters=[driver_params_file],
         namespace=robot_namespace,
-         remappings=[
+        remappings=[
             ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
-         ]
+        ],
     )
 
     velodyne_transform_node = launch_ros.actions.Node(
@@ -100,7 +99,7 @@ def generate_launch_description():
         remappings=[
             ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
             ("velodyne_points", [device_namespace, "/velodyne_points"]),
-         ]
+        ],
     )
 
     laserscan_share_dir = ament_index_python.packages.get_package_share_directory(
@@ -118,7 +117,22 @@ def generate_launch_description():
         remappings=[
             ("velodyne_points", [device_namespace, "/velodyne_points"]),
             ("scan", [device_namespace, "/scan"]),
-        ]
+        ],
+    )
+
+    static_transform_publisher = launch_ros.actions.Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        arguments=[
+            "0.185",
+            "0.0",
+            "0.2093",
+            "0.0",
+            "0.0",
+            "0.0",
+            [robot_namespace, "base_link"],
+            [robot_namespace, device_namespace],
+        ],
     )
 
     return launch.LaunchDescription(
@@ -130,6 +144,7 @@ def generate_launch_description():
             velodyne_driver_node,
             velodyne_transform_node,
             velodyne_laserscan_node,
+            static_transform_publisher,
             launch.actions.RegisterEventHandler(
                 event_handler=launch.event_handlers.OnProcessExit(
                     target_action=velodyne_driver_node,
