@@ -32,14 +32,18 @@
 
 """Launch the velodyne driver, pointcloud, and laserscan nodes with default configuration."""
 
-import os
-
-import ament_index_python.packages
-import launch
-import launch_ros.actions
-
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import EnvironmentVariable, LaunchConfiguration
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, EmitEvent, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
+from launch.substitutions import (
+    EnvironmentVariable,
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    PythonExpression,
+)
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 from nav2_common.launch import ReplaceString
 
 
@@ -48,7 +52,14 @@ def generate_launch_description():
     declare_device_namespace_arg = DeclareLaunchArgument(
         "device_namespace",
         default_value="velodyne",
-        description="Namespace for the device, utilized in TF frames and preceding device topics. This aids in differentiating between multiple cameras on the same robot.",
+        description="Namespace for the device, utilized in TF frames and preceding device topics. This aids in differentiating between multiple devices on the same robot.",
+    )
+
+    driver_params_file = LaunchConfiguration("driver_params_file")
+    declare_driver_params_file_arg = DeclareLaunchArgument(
+        "driver_params_file",
+        default_value="/config/panther_velodyne_driver.yaml",
+        description="Path to the parameter file for the velodyne_driver_node node.",
     )
 
     robot_namespace = LaunchConfiguration("robot_namespace")
@@ -58,97 +69,135 @@ def generate_launch_description():
         description="Namespace to all launched nodes and use namespace as tf_prefix. This aids in differentiating between multiple robots with the same devices.",
     )
 
-    driver_params_file = LaunchConfiguration("driver_params_file")
-    driver_params_file_arg = DeclareLaunchArgument(
-        "driver_params_file",
-        description="Path to the parameter file for the velodyne_driver_node node.",
-    )
-
     transform_params_file = LaunchConfiguration("transform_params_file")
-    transform_params_file_arg = DeclareLaunchArgument(
+    declare_transform_params_file_arg = DeclareLaunchArgument(
         "transform_params_file",
+        default_value="/config/panther_velodyne_pointcloud.yaml",
         description="Path to the parameter file for the velodyne_transform_node node.",
     )
 
-    driver_params_file = ReplaceString(
-        source_file=driver_params_file,
-        replacements={"<robot_namespace>": robot_namespace, "//": "/"},
-    )
-    driver_params_file = ReplaceString(
-        source_file=driver_params_file,
-        replacements={"<device_namespace>": device_namespace},
+    x = LaunchConfiguration("x")
+    declare_x_arg = DeclareLaunchArgument(
+        "x", default_value="0.185", description="Initial robot position in the global 'x' axis."
     )
 
-    velodyne_driver_node = launch_ros.actions.Node(
+    y = LaunchConfiguration("y")
+    declare_y_arg = DeclareLaunchArgument(
+        "y", default_value="0.0", description="Initial robot position in the global 'y' axis."
+    )
+
+    z = LaunchConfiguration("z")
+    declare_z_arg = DeclareLaunchArgument(
+        "z", default_value="0.209", description="Initial robot position in the global 'z' axis."
+    )
+
+    roll = LaunchConfiguration("roll")
+    declare_roll_arg = DeclareLaunchArgument(
+        "roll", default_value="0.0", description="Initial robot 'roll' orientation."
+    )
+
+    pitch = LaunchConfiguration("pitch")
+    declare_pitch_arg = DeclareLaunchArgument(
+        "pitch", default_value="0.0", description="Initial robot 'pitch' orientation."
+    )
+
+    yaw = LaunchConfiguration("yaw")
+    declare_yaw_arg = DeclareLaunchArgument(
+        "yaw", default_value="0.0", description="Initial robot 'yaw' orientation."
+    )
+
+    driver_params_file = ReplaceString(
+        source_file=driver_params_file,
+        replacements={
+            "<device_namespace>": device_namespace,
+            "<robot_namespace>": robot_namespace,
+            "//": "/",
+        },
+    )
+
+    device_ns = PythonExpression(
+        ["'", device_namespace, "' + '/' if '", device_namespace, "' else ''"]
+    )
+    robot_ns = PythonExpression(
+        ["'", robot_namespace, "' + '/' if '", robot_namespace, "' else ''"]
+    )
+
+    velodyne_driver_node = Node(
         package="velodyne_driver",
         executable="velodyne_driver_node",
-        output="both",
         parameters=[driver_params_file],
         namespace=robot_namespace,
         remappings=[
-            ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
+            ("velodyne_packets", [device_ns, "velodyne_packets"]),
         ],
     )
 
-    velodyne_transform_node = launch_ros.actions.Node(
+    velodyne_transform_node = Node(
         package="velodyne_pointcloud",
         executable="velodyne_transform_node",
-        output="both",
         parameters=[transform_params_file],
         namespace=robot_namespace,
         remappings=[
-            ("velodyne_packets", [device_namespace, "/velodyne_packets"]),
-            ("velodyne_points", [device_namespace, "/velodyne_points"]),
+            ("velodyne_packets", [device_ns, "velodyne_packets"]),
+            ("velodyne_points", [device_ns, "velodyne_points"]),
         ],
     )
 
-    laserscan_share_dir = ament_index_python.packages.get_package_share_directory(
-        "velodyne_laserscan"
+    laserscan_params_file = PathJoinSubstitution(
+        [
+            FindPackageShare("velodyne_laserscan"),
+            "config",
+            "default-velodyne_laserscan_node-params.yaml",
+        ]
     )
-    laserscan_params_file = os.path.join(
-        laserscan_share_dir, "config", "default-velodyne_laserscan_node-params.yaml"
-    )
-    velodyne_laserscan_node = launch_ros.actions.Node(
+
+    velodyne_laserscan_node = Node(
         package="velodyne_laserscan",
         executable="velodyne_laserscan_node",
-        output="both",
         parameters=[laserscan_params_file],
         namespace=robot_namespace,
         remappings=[
-            ("velodyne_points", [device_namespace, "/velodyne_points"]),
-            ("scan", [device_namespace, "/scan"]),
+            ("velodyne_points", [device_ns, "velodyne_points"]),
+            ("scan", [device_ns, "scan"]),
         ],
     )
 
-    static_transform_publisher = launch_ros.actions.Node(
+    static_transform_publisher = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
+        namespace=robot_namespace,
         arguments=[
-            "0.185",
-            "0.0",
-            "0.2093",
-            "0.0",
-            "0.0",
-            "0.0",
-            [robot_namespace, "base_link"],
-            [robot_namespace, device_namespace],
+            x,
+            y,
+            z,
+            roll,
+            pitch,
+            yaw,
+            [robot_ns, "base_link"],
+            [robot_ns, device_namespace],
         ],
     )
 
-    return launch.LaunchDescription(
+    return LaunchDescription(
         [
-            driver_params_file_arg,
-            transform_params_file_arg,
+            declare_driver_params_file_arg,
             declare_device_namespace_arg,
             declare_robot_namespace_arg,
+            declare_transform_params_file_arg,
+            declare_x_arg,
+            declare_y_arg,
+            declare_z_arg,
+            declare_roll_arg,
+            declare_pitch_arg,
+            declare_yaw_arg,
             velodyne_driver_node,
             velodyne_transform_node,
             velodyne_laserscan_node,
             static_transform_publisher,
-            launch.actions.RegisterEventHandler(
-                event_handler=launch.event_handlers.OnProcessExit(
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
                     target_action=velodyne_driver_node,
-                    on_exit=[launch.actions.EmitEvent(event=launch.events.Shutdown())],
+                    on_exit=[EmitEvent(event=Shutdown())],
                 )
             ),
         ]
