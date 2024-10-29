@@ -59,12 +59,12 @@ The image includes a custom `velodyne.launch.py` file, which is based on the off
 | `driver_params_file`    | Path to the parameter file for the velodyne_driver_node node. | `"/config/panther_velodyne_driver.yaml"` |
 | `robot_namespace`       | Namespace to all launched nodes and use namespace as tf_prefix. This aids in differentiating between multiple robots with the same devices. | `env("ROBOT_NAMESPACE")` (`""` if not specified) |
 | `transform_params_file` | Path to the parameter file for the velodyne_transform_node node. | `"/config/panther_velodyne_pointcloud.yaml"`     |
-| `x`                     | Initial robot position in the global 'x' axis. | `0.185` |
-| `y`                     | Initial robot position in the global 'y' axis. | `0.0`   |
-| `z`                     | Initial robot position in the global 'z' axis. | `0.209` |
-| `roll`                  | Initial robot 'roll' orientation.              | `0.0`   |
-| `pitch`                 | Initial robot 'pitch' orientation.             | `0.0`   |
-| `yaw`                   | Initial robot 'yaw' orientation.               | `0.0`   |
+| `x`                     | Initial sensor 'x' position relative to `cover_link`.        | `0.18`  |
+| `y`                     | Initial sensor 'y' position relative to `cover_link`.        | `0.0`   |
+| `z`                     | Initial sensor 'z' position relative to `cover_link`.        | `0.03`  |
+| `roll`                  | Initial sensor 'roll' orientation relative to `cover_link`.  | `0.0`   |
+| `pitch`                 | Initial sensor 'pitch' orientation relative to `cover_link`. | `0.0`   |
+| `yaw`                   | Initial sensor 'yaw' orientation relative to `cover_link`.   | `0.0`   |
 
 Using both `device_namespace` and `robot_namespace` makes:
 

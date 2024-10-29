@@ -78,32 +78,32 @@ def generate_launch_description():
 
     x = LaunchConfiguration("x")
     declare_x_arg = DeclareLaunchArgument(
-        "x", default_value="0.185", description="Initial robot position in the global 'x' axis."
+        "x", default_value="0.18", description="Initial sensor 'x' position relative to `cover_link`."
     )
 
     y = LaunchConfiguration("y")
     declare_y_arg = DeclareLaunchArgument(
-        "y", default_value="0.0", description="Initial robot position in the global 'y' axis."
+        "y", default_value="0.0", description="Initial sensor 'y' position relative to `cover_link`."
     )
 
     z = LaunchConfiguration("z")
     declare_z_arg = DeclareLaunchArgument(
-        "z", default_value="0.209", description="Initial robot position in the global 'z' axis."
+        "z", default_value="0.03", description="Initial sensor 'z' position relative to `cover_link`."
     )
 
     roll = LaunchConfiguration("roll")
     declare_roll_arg = DeclareLaunchArgument(
-        "roll", default_value="0.0", description="Initial robot 'roll' orientation."
+        "roll", default_value="0.0", description="Initial sensor 'roll' orientation relative to `cover_link`."
     )
 
     pitch = LaunchConfiguration("pitch")
     declare_pitch_arg = DeclareLaunchArgument(
-        "pitch", default_value="0.0", description="Initial robot 'pitch' orientation."
+        "pitch", default_value="0.0", description="Initial sensor 'pitch' orientation relative to `cover_link`."
     )
 
     yaw = LaunchConfiguration("yaw")
     declare_yaw_arg = DeclareLaunchArgument(
-        "yaw", default_value="0.0", description="Initial robot 'yaw' orientation."
+        "yaw", default_value="0.0", description="Initial sensor 'yaw' orientation relative to `cover_link`."
     )
 
     device_ns = PythonExpression(
