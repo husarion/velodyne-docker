@@ -106,20 +106,19 @@ def generate_launch_description():
         "yaw", default_value="0.0", description="Initial robot 'yaw' orientation."
     )
 
-    driver_params_file = ReplaceString(
-        source_file=driver_params_file,
-        replacements={
-            "<device_namespace>": device_namespace,
-            "<robot_namespace>": robot_namespace,
-            "//": "/",
-        },
-    )
-
     device_ns = PythonExpression(
         ["'", device_namespace, "' + '/' if '", device_namespace, "' else ''"]
     )
     robot_ns = PythonExpression(
         ["'", robot_namespace, "' + '/' if '", robot_namespace, "' else ''"]
+    )
+
+    driver_params_file = ReplaceString(
+        source_file=driver_params_file,
+        replacements={
+            "<robot_namespace>/": robot_ns,
+            "<device_namespace>": device_namespace,
+        },
     )
 
     velodyne_driver_node = Node(
