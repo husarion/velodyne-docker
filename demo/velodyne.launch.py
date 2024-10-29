@@ -172,7 +172,7 @@ def generate_launch_description():
             roll,
             pitch,
             yaw,
-            [robot_ns, "base_link"],
+            [robot_ns, "cover_link"],
             [robot_ns, device_namespace],
         ],
     )
