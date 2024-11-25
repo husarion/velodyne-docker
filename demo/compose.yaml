@@ -17,4 +17,6 @@ services:
       - ./velodyne.launch.py:/velodyne.launch.py
     command: >
       ros2 launch /velodyne.launch.py
+        transform_params_file:=/config/panther_velodyne_pointcloud.yaml
+        driver_params_file:=/config/panther_velodyne_driver.yaml
         robot_namespace:=panther
