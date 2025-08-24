@@ -8,7 +8,7 @@ x-common-config: &common-config
 
 services:
   velodyne:
-    image: husarion/velodyne:humble-2.4.0-20240723
+    image: husarion/velodyne:humble-ros2-fix-tf # TODO: change after bump
     container_name: velodyne
     <<: *common-config
     volumes:
@@ -19,4 +19,4 @@ services:
       ros2 launch /velodyne.launch.py
         transform_params_file:=/config/panther_velodyne_pointcloud.yaml
         driver_params_file:=/config/panther_velodyne_driver.yaml
-        robot_namespace:=panther/
+        robot_namespace:=panther
